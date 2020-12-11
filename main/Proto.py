@@ -9,12 +9,13 @@ import tkinter.font as font			#font
 from tkinter import filedialog		#GUIでパスを指定するためのファイルダイアログのやつ
 from tkinter import ttk				#tk拡張
 from PIL import Image, ImageTk		#GUIにいろんな画像貼り付けるため
-import webbrowser	#ブラウザ操作用
-import tensorflow as tf #機械学習
-import pathlib #パス操作用
+import webbrowser					#ブラウザ操作用
+import tensorflow as tf 			#機械学習
+import pathlib						#パス操作用
 from pixiv.example import vone
-#from movet.example import vtwo
 import json
+import time		#時間計測用
+import timeit	
 
 #文字コードをUTF-8で指定して日本語ファイルを開けるようにする
 import io
@@ -56,8 +57,6 @@ cascades = [cas_hubuki,cas_korone,cas_akua,cas_pekora,cas_koko,cas_marin,cas_mat
 #キャラの辞書型変数
 chara_id = {'1':'hubuki','2':'korone','3':'akua','4':'pekora','5':'koko','6':'marin','7':'maturi','8':'haato','9':'noeru','10':'rusia'}
 chara_id2 = {'0':'sirakami','1':'inugami','2':'minato','3':'usada','4':'kiryu','5':'housyou','6':'natuiro','7':'akai','8':'sirogane','9':'uruha'}
-chara_id3 = {'0':'hubuki','1':'korone','2':'akua','3':'pekora','4':'koko','5':'marin','6':'maturi','7':'haato','8':'noeru','9':'rusia'}
-
 chara_dict = {'hubuki':0,'korone':0,'akua':0,'pekora':0,'koko':0,'marin':0,'maturi':0,'haato':0,'noeru':0,'rusia':0}
 
 #キャラクタ紹介の個人ページ(フレーム)作成
@@ -121,7 +120,7 @@ def file_select():
 	global picturename
 	global paths
 	fTyp = [("画像ファイル","*.png;*.jpg;*.gif;*.jpeg")]				#参照可能なファイル形式指定
-	iDir = os.path.abspath(os.path.dirname(__file__))					#デフォルトで開くパス指定
+	iDir = os.getenv("HOMEDRIVE") + os.getenv("HOMEPATH") + "\\Pictures"					#デフォルトで開くパス指定
 	filepath = filedialog.askopenfilename(filetypes = fTyp,initialdir = iDir)	#ファイルダイアログを開く
 	filepathvar.set(filepath)
 	picturename = str(os.path.splitext(os.path.basename(filepath))[0])			#取得したアドレスから画像の名前を保存
@@ -136,8 +135,12 @@ def gazou():
 	global paths
 	img = cv.imread(filepath)
 	img_g = cv.imread(filepath,0)
-	vone.loobe('./data/png_to_jpg.jpg')
+	
+#	start = time.perf_counter()
 	a = vone.loobe('./data/png_to_jpg.jpg')
+#	end = time.perf_counter()
+#	print(f"実行時間: {end - start}")
+	
 	b = [k for k, v in chara_id2.items() if v == a]
 	create_intro(int(b[0]))
 
@@ -220,10 +223,12 @@ hanbetu_button = ttk.Button(main_frame,text=u'キャラ判別',command=lambda:ch
 ziten_button = ttk.Button(main_frame,text=u'キャラ辞典',command=lambda:changePage(index))
 ofi_button = ttk.Button(main_frame,text=u'ホロライブ公式HP',command=lambda:link('https://www.hololive.tv/'))
 
+#	背景画像を追加しようとしていたがすべてのフレームで適応するのに時間がかかりそうなためコメントアウト
 #メイン_背景 
 img_read = Image.open('./img/backg.png')
 img_bg = ImageTk.PhotoImage(img_read)
 bg = ttk.Label(main_frame,image=img_bg)
+
 
 #キャラ判別_フレーム ウィジット作成
 hanbetu_frame = ttk.Frame(root)
